@@ -2,6 +2,7 @@ import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { prisma } from "./prisma";
 import { admin } from "better-auth/plugins";
+import { allowedOrigins } from "../config/cors";
 
 export const auth = betterAuth({
   database: prismaAdapter(prisma, {
@@ -14,6 +15,6 @@ export const auth = betterAuth({
       clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
     },
   },
-  trustedOrigins: ["http://localhost:3000", "http://localhost:3001"],
+  trustedOrigins: allowedOrigins,
   plugins: [admin()],
 });
