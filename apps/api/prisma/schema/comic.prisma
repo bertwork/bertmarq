@@ -1,0 +1,167 @@
+model Comic {
+  id          String      @id @default(cuid())
+  title       String
+  slug        String      @unique
+  cover       String
+  description String?
+  status      ComicStatus @default(ONGOING)
+  type        ComicType   @default(MANGA)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  chapters     Chapter[]
+  bookmarks    Bookmark[]
+  comicGenres  ComicGenre[]
+  providers    ComicProvider[]
+  ratings      Rating[]
+  comments     Comment[]
+  comicAuthors ComicAuthor[]
+  comicArtists ComicArtist[]
+}
+
+model Provider {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  baseUrl   String
+  createdAt DateTime @default(now())
+
+  comicProviders ComicProvider[]
+}
+
+model ComicProvider {
+  id         String @id @default(cuid())
+  comicId    String
+  providerId String
+  url        String
+
+  comic    Comic    @relation(fields: [comicId], references: [id], onDelete: Cascade)
+  provider Provider @relation(fields: [providerId], references: [id], onDelete: Cascade)
+  chapters Chapter[]
+
+  @@unique([comicId, providerId])
+}
+
+model Chapter {
+  id              String   @id @default(cuid())
+  comicId         String
+  comicProviderId String
+  number          Float
+  title           String?
+  sourceUrl       String
+  createdAt       DateTime @default(now())
+
+  comic         Comic         @relation(fields: [comicId], references: [id], onDelete: Cascade)
+  comicProvider ComicProvider @relation(fields: [comicProviderId], references: [id], onDelete: Cascade)
+  bookmarks     Bookmark[]
+  readHistory   ReadHistory[]
+}
+
+model Genre {
+  id   String @id @default(cuid())
+  name String @unique
+  slug String @unique
+
+  comicGenres ComicGenre[]
+}
+
+model ComicGenre {
+  comicId String
+  genreId String
+
+  comic Comic @relation(fields: [comicId], references: [id], onDelete: Cascade)
+  genre Genre @relation(fields: [genreId], references: [id], onDelete: Cascade)
+
+  @@id([comicId, genreId])
+}
+
+model Author {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  createdAt DateTime @default(now())
+
+  comics ComicAuthor[]
+}
+
+model Artist {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  createdAt DateTime @default(now())
+
+  comics ComicArtist[]
+}
+
+model ComicAuthor {
+  comicId  String
+  authorId String
+
+  comic  Comic  @relation(fields: [comicId], references: [id], onDelete: Cascade)
+  author Author @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@id([comicId, authorId])
+}
+
+model ComicArtist {
+  comicId  String
+  artistId String
+
+  comic  Comic  @relation(fields: [comicId], references: [id], onDelete: Cascade)
+  artist Artist @relation(fields: [artistId], references: [id], onDelete: Cascade)
+
+  @@id([comicId, artistId])
+}
+
+model Bookmark {
+  id            String   @id @default(cuid())
+  userId        String
+  comicId       String
+  lastChapterId String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  comic       Comic    @relation(fields: [comicId], references: [id], onDelete: Cascade)
+  lastChapter Chapter? @relation(fields: [lastChapterId], references: [id])
+
+  @@unique([userId, comicId])
+}
+
+model ReadHistory {
+  id        String   @id @default(cuid())
+  userId    String
+  chapterId String
+  readAt    DateTime @default(now())
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  chapter Chapter @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, chapterId])
+}
+
+model Rating {
+  id        String   @id @default(cuid())
+  userId    String
+  comicId   String
+  score     Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  comic Comic @relation(fields: [comicId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, comicId])
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  userId    String
+  comicId   String
+  parentId  String?
+  body      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user    User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  comic   Comic     @relation(fields: [comicId], references: [id], onDelete: Cascade)
+  parent  Comment?  @relation("CommentReplies", fields: [parentId], references: [id])
+  replies Comment[] @relation("CommentReplies")
+}

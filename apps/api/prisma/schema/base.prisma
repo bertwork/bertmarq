@@ -1,0 +1,24 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum ComicStatus {
+  ONGOING
+  COMPLETED
+  HIATUS
+  DROPPED
+}
+
+enum ComicType {
+  MANGA
+  MANHWA
+  MANHUA
+  WEBTOON
+  OEL
+}
+
