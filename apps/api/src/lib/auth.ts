@@ -1,8 +1,8 @@
-import { betterAuth } from "better-auth";
-import { prismaAdapter } from "better-auth/adapters/prisma";
-import { prisma } from "./prisma";
-import { admin } from "better-auth/plugins";
-import { allowedOrigins } from "../config/cors";
+import { betterAuth } from "better-auth"
+import { prismaAdapter } from "better-auth/adapters/prisma"
+import { prisma } from "./prisma"
+import { admin } from "better-auth/plugins"
+import { allowedOrigins } from "../config/cors"
 
 export const auth = betterAuth({
   database: prismaAdapter(prisma, {
@@ -17,4 +17,4 @@ export const auth = betterAuth({
   },
   trustedOrigins: allowedOrigins,
   plugins: [admin()],
-});
+})
